@@ -2,7 +2,7 @@
   "name": "@eliware/mysql",
   "type": "module",
   "version": "1.1.0",
-  "description": "A Node.js mysql.",
+  "description": "A simple, dependency-injectable MySQL connection pool utility for Node.js, supporting both ESM and CommonJS.",
   "main": "index.cjs",
   "module": "index.mjs",
   "types": "index.d.ts",
@@ -27,10 +27,15 @@
     "type": "git",
     "url": "git+https://github.com/eliware/mysql.git"
   },
-    "keywords": [
-        "mysql",
-        "nodejs"
-    ],
+  "keywords": [
+    "mysql",
+    "mysql2",
+    "nodejs",
+    "esm",
+    "cjs",
+    "dependency-injection",
+    "connection-pool"
+  ],
   "author": "Eli Sterling, eliware.org <eli@eliware.org>",
   "license": "MIT",
   "bugs": {
@@ -49,6 +54,7 @@
     ]
   },
   "dependencies": {
-    "@eliware/common": "^1.1.1"
+    "@eliware/log": "^1.1.1",
+    "mysql2": "^3.14.2"
   }
 }
