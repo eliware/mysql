@@ -24,6 +24,7 @@
 - TypeScript type definitions included
 - Helpful error logging
 - Supports optional pool config via environment variables
+- Supports TLS, timeouts, pool overrides, health checks, and graceful close helpers
 
 ## Installation
 
@@ -56,10 +57,11 @@ Creates and returns a MySQL connection pool.
 - `options.env` (object, optional): Environment variables (default: `process.env`)
 - `options.mysqlLib` (object, optional): mysql2/promise module (default: static import/require, must have createPool)
 - `options.log` (object, optional): Logger instance (default: `@eliware/log`)
+- `options.poolOptions` (object, optional): Explicit mysql2 pool options; these override environment-derived values.
 
 **Returns:**
 
-- `Promise<Pool>`: A MySQL connection pool instance. Call `pool.end()` when finished.
+- `Promise<Pool>`: A MySQL connection pool instance. Call `closeDb(pool)` or `pool.end()` when finished. Use `verifyConnection(pool)` for a health check.
 
 **Throws:**
 
@@ -84,6 +86,9 @@ Optional:
 - `MYSQL_CONNECTION_LIMIT` - Max connections in pool (default: 10)
 - `MYSQL_QUEUE_LIMIT` - Max queued connection requests (default: 0)
 - `MYSQL_PORT` - MySQL server port (default: 3306)
+- `MYSQL_CONNECT_TIMEOUT` - Connection timeout in milliseconds (default: 10000)
+- `MYSQL_ACQUIRE_TIMEOUT` - Pool acquire timeout in milliseconds (default: 10000)
+- `MYSQL_SSL` - JSON TLS options, or `insecure` for development
 
 **Example:**
 

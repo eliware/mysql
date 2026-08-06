@@ -1,13 +1,11 @@
 import type { Pool, PoolOptions } from 'mysql2/promise';
 
 export interface CreateDbOptions {
-  /** Environment variables (defaults to process.env). */
-  env?: Record<string, string | number | boolean | undefined>;
-  /** mysql2/promise-compatible module used to create the pool. */
+  env?: Record<string, string | number | boolean | object | undefined>;
   mysqlLib?: { createPool: (options: PoolOptions) => Pool };
-  /** Logger implementing debug and error. */
   log?: { debug: (...args: unknown[]) => void; error: (...args: unknown[]) => void };
+  poolOptions?: Partial<PoolOptions>;
 }
-
-/** Create a MySQL connection pool from environment variables. */
-export function createDb(options?: CreateDbOptions): Promise<Pool>;
+export function createDb(options?: CreateDbOptions): Pool;
+export function verifyConnection(pool: Pick<Pool, 'query'>): Promise<boolean>;
+export function closeDb(pool: Pick<Pool, 'end'>): Promise<void>;

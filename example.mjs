@@ -1,13 +1,22 @@
-// Example usage for ES Modules
 import log from '@eliware/log';
-import { createDb } from '@eliware/mysql';
+import { closeDb, createDb, verifyConnection } from './index.mjs';
 
-(async () => {
-    try {
-        const db = await createDb({ log });
-        log.info('MySQL pool created:', { db: !!db });
-        await db.end();
-    } catch (err) {
-        log.error('Error:', err);
-    }
-})();
+const db = await createDb({
+  log,
+  // poolOptions override environment-derived settings when needed.
+  poolOptions: {
+    connectionLimit: 10,
+    // Enable opt-in TLS when the CA is available:
+    // ssl: { ca: '/etc/mysql/tls/ca.pem', rejectUnauthorized: true },
+  },
+});
+
+try {
+  await verifyConnection(db);
+  log.info('MySQL connection verified');
+  const [rows] = await db.query('SELECT 1 AS smoke_test');
+  log.info('Query succeeded', { rows });
+} finally {
+  await closeDb(db);
+  log.info('MySQL pool closed');
+}

@@ -1,5 +1,5 @@
 import { jest, test, expect, describe } from '@jest/globals';
-import { createDb } from './index.mjs';
+import { createDb, verifyConnection, closeDb } from './index.mjs';
 
 const env = { MYSQL_HOST: 'localhost', MYSQL_USER: 'root', MYSQL_PASSWORD: 'secret', MYSQL_DATABASE: 'test' };
 const logger = () => ({ debug: jest.fn(), error: jest.fn() });
@@ -58,4 +58,22 @@ describe('createDb', () => {
     await expect(createDb({ env, mysqlLib, log })).rejects.toBe('fail');
     expect(log.error).toHaveBeenCalledWith('Failed to create MySQL connection pool', 'fail');
   });
+});
+
+test('supports pool overrides, TLS, timeouts, health checks, and close', async () => {
+  const pool = { query: jest.fn(async () => [[]]), end: jest.fn(async () => undefined) };
+  const mysqlLib = { createPool: jest.fn(() => pool) };
+  await createDb({ env: { ...env, MYSQL_SSL: '{"rejectUnauthorized":true}', MYSQL_CONNECT_TIMEOUT: '5000', MYSQL_ACQUIRE_TIMEOUT: '6000' }, mysqlLib, poolOptions: { connectionLimit: 4 }, log: logger() });
+  expect(mysqlLib.createPool).toHaveBeenCalledWith(expect.objectContaining({ connectionLimit: 4, connectTimeout: 5000, acquireTimeout: 6000, ssl: { rejectUnauthorized: true } }));
+  await expect(verifyConnection(pool)).resolves.toBe(true);
+  await expect(closeDb(pool)).resolves.toBeUndefined();
+});
+
+test('supports insecure TLS and validates lifecycle helpers', async () => {
+  const mysqlLib = { createPool: jest.fn(() => ({})) };
+  await createDb({ env: { ...env, MYSQL_SSL: 'insecure' }, mysqlLib, log: logger() });
+  await createDb({ env, mysqlLib, poolOptions: { ssl: { rejectUnauthorized: false } }, log: logger() });
+  await createDb({ env: { ...env, MYSQL_SSL: { rejectUnauthorized: true } }, mysqlLib, log: logger() });
+  await expect(verifyConnection()).rejects.toThrow(TypeError);
+  await expect(closeDb()).rejects.toThrow(TypeError);
 });
