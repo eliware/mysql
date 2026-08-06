@@ -2,7 +2,7 @@
 
 ## @eliware/mysql [![npm version](https://img.shields.io/npm/v/@eliware/mysql.svg)](https://www.npmjs.com/package/@eliware/mysql)[![license](https://img.shields.io/github/license/eliware/mysql.svg)](LICENSE)[![build status](https://github.com/eliware/mysql/actions/workflows/nodejs.yml/badge.svg)](https://github.com/eliware/mysql/actions)
 
-> A simple, dependency-injectable MySQL connection pool utility for Node.js, supporting both ESM and CommonJS.
+> A simple, dependency-injectable MySQL connection pool utility for Node.js, supporting ESM.
 
 ---
 
@@ -12,7 +12,6 @@
 - [Installation](#installation)
 - [Usage](#usage)
   - [ESM Example](#esm-example)
-  - [CommonJS Example](#commonjs-example)
 - [API](#api)
 - [TypeScript](#typescript)
 - [License](#license)
@@ -20,7 +19,7 @@
 ## Features
 
 - Simple async function to create a MySQL connection pool
-- Supports both ESM and CommonJS
+- Supports ESM
 - Dependency injection for testability (mock MySQL, logger, or env)
 - TypeScript type definitions included
 - Helpful error logging
@@ -46,18 +45,6 @@ import { createDb } from '@eliware/mysql';
 })();
 ```
 
-### CommonJS Example
-
-```js
-const { createDb } = require('@eliware/mysql');
-
-(async () => {
-  const db = await createDb();
-  // Use db.query, db.execute, etc.
-  await db.end();
-})();
-```
-
 ## API
 
 ### createDb(options?)
@@ -72,12 +59,15 @@ Creates and returns a MySQL connection pool.
 
 **Returns:**
 
-- `Promise<Pool>`: A MySQL connection pool instance
+- `Promise<Pool>`: A MySQL connection pool instance. Call `pool.end()` when finished.
 
 **Throws:**
 
 - If required environment variables are missing
+- If `mysqlLib.createPool` is missing
 - If pool creation fails
+
+The connection password is never included in debug log output.
 
 **Environment Variables:**
 
@@ -109,7 +99,7 @@ const db = await createDb({
     MYSQL_CONNECTION_LIMIT: '20',
     MYSQL_QUEUE_LIMIT: '5',
   },
-  mysqlLib: require('mysql2/promise'), // or import * as mysql2Promise from 'mysql2/promise' for ESM
+  mysqlLib: mysql2Promise,
   log: console,
 });
 ```
@@ -121,14 +111,14 @@ Type definitions are included:
 ```ts
 export interface CreateDbOptions {
   /** Environment variables (default: process.env) */
-  env?: Record<string, string>;
-  /** mysql2/promise module (default: static import/require, must have createPool) */
-  mysqlLib?: any;
-  /** Logger instance (default: log) */
-  log?: any;
+  env?: Record<string, string | number | boolean | undefined>;
+  /** mysql2/promise-compatible module used to create the pool */
+  mysqlLib?: { createPool: (options: import('mysql2/promise').PoolOptions) => import('mysql2/promise').Pool };
+  /** Logger implementing debug and error */
+  log?: { debug: (...args: unknown[]) => void; error: (...args: unknown[]) => void };
 }
 
-export function createDb(options?: CreateDbOptions): Promise<any>;
+export function createDb(options?: CreateDbOptions): Promise<import('mysql2/promise').Pool>;
 ```
 
 ## Support

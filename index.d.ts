@@ -1,19 +1,13 @@
-/**
- * TypeScript type definitions for the createDb function
- */
+import type { Pool, PoolOptions } from 'mysql2/promise';
+
 export interface CreateDbOptions {
-    /** Environment variables (default: process.env) */
-    env?: Record<string, string>;
-    /** mysql2/promise module (default: static import/require, must have createPool) */
-    mysqlLib?: any;
-    /** Logger instance (default: log) */
-    log?: any;
+  /** Environment variables (defaults to process.env). */
+  env?: Record<string, string | number | boolean | undefined>;
+  /** mysql2/promise-compatible module used to create the pool. */
+  mysqlLib?: { createPool: (options: PoolOptions) => Pool };
+  /** Logger implementing debug and error. */
+  log?: { debug: (...args: unknown[]) => void; error: (...args: unknown[]) => void };
 }
 
-/**
- * Creates and returns a MySQL connection pool, allowing dependency injection for testability.
- *
- * @param options - Options for pool creation
- * @returns Promise<import('mysql2/promise').Pool>
- */
-export function createDb(options?: CreateDbOptions): Promise<any>;
+/** Create a MySQL connection pool from environment variables. */
+export function createDb(options?: CreateDbOptions): Promise<Pool>;

@@ -2,28 +2,26 @@
   "name": "@eliware/mysql",
   "type": "module",
   "version": "1.1.1",
-  "description": "A simple, dependency-injectable MySQL connection pool utility for Node.js, supporting both ESM and CommonJS.",
-  "main": "index.cjs",
+  "description": "A simple, dependency-injectable MySQL connection pool utility for Node.js, supporting ESM.",
   "module": "index.mjs",
   "types": "index.d.ts",
   "files": [
     "index.mjs",
-    "index.cjs",
     "index.d.ts",
     "README.md",
     "LICENSE"
   ],
   "exports": {
     ".": {
-      "import": "./index.mjs",
-      "require": "./index.cjs",
-      "types": "./index.d.ts"
+      "types": "./index.d.ts",
+      "import": "./index.mjs"
     }
   },
   "scripts": {
     "test": "npx --node-options=\"--experimental-vm-modules --no-warnings\" jest --detectOpenHandles --silent --coverage",
     "test:gaps": "npm test -- --coverageReporters=text 2>&1 | awk '!/100%/'",
-    "lint": "npx oxlint ."
+    "lint": "npx oxlint .",
+    "pack": "npm pack --dry-run"
   },
   "repository": {
     "type": "git",
@@ -34,7 +32,6 @@
     "mysql2",
     "nodejs",
     "esm",
-    "cjs",
     "dependency-injection",
     "connection-pool"
   ],
@@ -51,12 +48,14 @@
     "testEnvironment": "node",
     "testMatch": [
       "**/?(*.)+(spec|test).[jt]s?(x)",
-      "**/?(*.)+(spec|test).mjs",
-      "**/?(*.)+(spec|test).cjs"
+      "**/?(*.)+(spec|test).mjs"
     ]
   },
   "dependencies": {
     "@eliware/log": "^1.1.4",
     "mysql2": "^3.23.2"
+  },
+  "engines": {
+    "node": ">=26"
   }
 }
