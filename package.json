@@ -44,7 +44,7 @@
   },
   "homepage": "https://github.com/eliware/mysql#readme",
   "devDependencies": {
-    "jest": "^30.0.4"
+    "jest": "^30.4.2"
   },
   "jest": {
     "testEnvironment": "node",
@@ -55,7 +55,7 @@
     ]
   },
   "dependencies": {
-    "@eliware/log": "^1.1.1",
-    "mysql2": "^3.14.2"
+    "@eliware/log": "^1.1.4",
+    "mysql2": "^3.23.2"
   }
 }
