@@ -9,11 +9,15 @@
 ## Table of Contents
 
 - [Features](#features)
+- [Requirements](#requirements)
 - [Installation](#installation)
 - [Usage](#usage)
   - [ESM Example](#esm-example)
 - [API](#api)
 - [TypeScript](#typescript)
+- [Errors / Troubleshooting](#errors--troubleshooting)
+- [Development](#development)
+- [Security](#security)
 - [License](#license)
 
 ## Features
@@ -25,6 +29,11 @@
 - Helpful error logging
 - Supports optional pool config via environment variables
 - Supports TLS, timeouts, pool overrides, health checks, and graceful close helpers
+
+## Requirements
+
+- Node.js 26 or newer
+- A reachable MySQL-compatible server for database operations
 
 ## Installation
 
@@ -125,6 +134,26 @@ export interface CreateDbOptions {
 
 export function createDb(options?: CreateDbOptions): Promise<import('mysql2/promise').Pool>;
 ```
+
+## Errors / Troubleshooting
+
+`createDb()` validates required environment variables before creating a pool and rethrows pool-creation errors after logging redacted details. Passwords and private TLS key material must not be logged. Use `verifyConnection(pool)` for a read-only `SELECT 1` health check and `closeDb(pool)` for repeatable application shutdown cleanup.
+
+## Development
+
+```bash
+npm test
+npm run test:gaps
+npm run lint
+npm run typecheck
+npm run pack
+```
+
+Tests inject the MySQL module, environment, logger, and pool options; no live database or destructive query is required.
+
+## Security
+
+TLS is opt-in. Keep credentials outside source control, use `MYSQL_SSL` or explicit pool options for secure deployments, and never log passwords or private TLS key material.
 
 ## Support
 
