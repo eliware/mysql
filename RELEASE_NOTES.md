@@ -1,5 +1,9 @@
 # Release Notes
 
+## 1.1.3 — 2026-08-07
+
+- Updated the runtime dependency on `@eliware/log` to `^1.1.10`.
+
 ## 1.1.2 — 2026-08-06
 
 - Modernized the package as an ESM-first MySQL pool utility.
