@@ -1,5 +1,5 @@
 import { jest, test, expect, describe } from '@jest/globals';
-import { createDb, verifyConnection, closeDb } from './index.mjs';
+import { createDb, verifyConnection, closeDb } from '../index.mjs';
 
 const env = { MYSQL_HOST: 'localhost', MYSQL_USER: 'root', MYSQL_PASSWORD: 'secret', MYSQL_DATABASE: 'test' };
 const logger = () => ({ debug: jest.fn(), error: jest.fn() });
