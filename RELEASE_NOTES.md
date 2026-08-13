@@ -1,5 +1,13 @@
 # Release Notes
 
+## 1.1.6 — 2026-08-13
+
+- Added optional read-pool routing with `MYSQL_READPORT` and `MYSQL_READHOST`.
+- Routes conservative single-statement `SELECT`, `SHOW`, `DESCRIBE`, `DESC`, and `EXPLAIN` queries to the read pool.
+- Keeps mutations, transactions, locks, procedure calls, and ambiguous queries on the write pool.
+- Expanded routing safety tests and raised coverage to 100% across all metrics.
+- Updated README configuration and routing documentation.
+
 ## 1.1.4 — 2026-08-07
 
 - Standardized package layout, validation scripts, TypeScript checking, CI, and package contents.

@@ -45,7 +45,7 @@ const createRoutingPool = (writePool, readPool) => new Proxy(writePool, {
   },
 });
 
-const poolConfig = (env, poolOptions = {}) => {
+const poolConfig = (env, poolOptions) => {
   const config = {
     host: env.MYSQL_HOST, user: env.MYSQL_USER, password: env.MYSQL_PASSWORD, database: env.MYSQL_DATABASE,
     port: parseInteger(env.MYSQL_PORT, 3306, 1), waitForConnections: parseBoolean(env.MYSQL_WAIT_FOR_CONNECTIONS, true),
