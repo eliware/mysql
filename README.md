@@ -29,6 +29,7 @@
 - Helpful error logging
 - Supports optional pool config via environment variables
 - Supports TLS, timeouts, pool overrides, health checks, and graceful close helpers
+- Optionally routes conservative read-only queries to a separate read pool
 
 ## Requirements
 
@@ -95,6 +96,8 @@ Optional:
 - `MYSQL_CONNECTION_LIMIT` - Max connections in pool (default: 10)
 - `MYSQL_QUEUE_LIMIT` - Max queued connection requests (default: 0)
 - `MYSQL_PORT` - MySQL server port (default: 3306)
+- `MYSQL_READPORT` - Enables read routing and sets the read pool port (for example, `3307`)
+- `MYSQL_READHOST` - Optional read pool host (defaults to `MYSQL_HOST`)
 - `MYSQL_CONNECT_TIMEOUT` - Connection timeout in milliseconds (default: 10000)
 - `MYSQL_ACQUIRE_TIMEOUT` - Pool acquire timeout in milliseconds (default: 10000)
 - `MYSQL_SSL` - JSON TLS options, or `insecure` for development
@@ -138,6 +141,12 @@ export function createDb(options?: CreateDbOptions): Promise<import('mysql2/prom
 ## Errors / Troubleshooting
 
 `createDb()` validates required environment variables before creating a pool and rethrows pool-creation errors after logging redacted details. Passwords and private TLS key material must not be logged. Use `verifyConnection(pool)` for a read-only `SELECT 1` health check and `closeDb(pool)` for repeatable application shutdown cleanup.
+
+When `MYSQL_READPORT` is set, `query()` and `execute()` route only single-statement
+`SELECT`, `SHOW`, `DESCRIBE`, `DESC`, and `EXPLAIN` calls to the read pool. Queries
+with transactions, locks, procedure calls, `INTO OUTFILE`, multiple statements,
+or ambiguous syntax stay on the write pool. `getConnection()` always uses the
+write pool so transaction state remains pinned safely.
 
 ## Development
 

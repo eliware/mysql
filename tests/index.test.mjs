@@ -77,3 +77,59 @@ test('supports insecure TLS and validates lifecycle helpers', async () => {
   await expect(verifyConnection()).rejects.toThrow(TypeError);
   await expect(closeDb()).rejects.toThrow(TypeError);
 });
+
+test('routes conservative read-only queries to the optional read pool', async () => {
+  const writePool = { query: jest.fn(async () => [['write']]), execute: jest.fn(async () => [['write']]), end: jest.fn(async () => undefined) };
+  const readPool = { query: jest.fn(async () => [['read']]), execute: jest.fn(async () => [['read']]), end: jest.fn(async () => undefined) };
+  const pools = [writePool, readPool];
+  const mysqlLib = { createPool: jest.fn(() => pools.shift()) };
+  const db = await createDb({ env: { ...env, MYSQL_READPORT: '3307' }, mysqlLib, log: logger() });
+  await db.query('SELECT 1');
+  await db.execute('SHOW STATUS');
+  await db.query('UPDATE users SET name = ?', ['name']);
+  await db.query('SELECT * FROM users FOR UPDATE');
+  await db.query('/* comment */ DESCRIBE users');
+  expect(readPool.query).toHaveBeenCalledTimes(2);
+  expect(readPool.execute).toHaveBeenCalledTimes(1);
+  expect(writePool.query).toHaveBeenCalledTimes(2);
+  await db.end();
+  expect(writePool.end).toHaveBeenCalled();
+  expect(readPool.end).toHaveBeenCalled();
+  expect(mysqlLib.createPool).toHaveBeenNthCalledWith(2, expect.objectContaining({ host: 'localhost', port: 3307 }));
+});
+
+test('routes all supported read forms and explicit read host', async () => {
+  const writePool = { query: jest.fn(), execute: jest.fn(), end: jest.fn(async () => undefined) };
+  const readPool = { query: jest.fn(), execute: jest.fn(), end: jest.fn(async () => undefined) };
+  const mysqlLib = { createPool: jest.fn().mockReturnValueOnce(writePool).mockReturnValueOnce(readPool) };
+  const db = await createDb({ env: { ...env, MYSQL_READPORT: 'not-a-port', MYSQL_READHOST: 'reader' }, mysqlLib, log: logger() });
+  for (const sql of ['SELECT 1', 'SHOW TABLES', 'DESCRIBE users', 'DESC users', 'EXPLAIN SELECT 1', '# comment\nSELECT 1', '-- comment\nSHOW STATUS']) await db.query(sql);
+  expect(readPool.query).toHaveBeenCalledTimes(7);
+  expect(mysqlLib.createPool).toHaveBeenNthCalledWith(2, expect.objectContaining({ host: 'reader', port: 3307 }));
+  await db.end();
+});
+
+test('keeps ambiguous and mutating statements on the write pool', async () => {
+  const writePool = { query: jest.fn(), execute: jest.fn(), end: jest.fn(async () => undefined) };
+  const readPool = { query: jest.fn(), execute: jest.fn(), end: jest.fn(async () => undefined) };
+  const mysqlLib = { createPool: jest.fn().mockReturnValueOnce(writePool).mockReturnValueOnce(readPool) };
+  const db = await createDb({ env: { ...env, MYSQL_READPORT: '3307' }, mysqlLib, log: logger() });
+  for (const sql of ['SELECT 1;', 'SELECT 1; SELECT 2', '/* unclosed SELECT 1', 'SELECT 1 INTO OUTFILE "/tmp/x"', 'SELECT 1 LOCK IN SHARE MODE', 'CALL proc()', 'INSERT INTO users VALUES (?)']) await db.execute(sql, [1]);
+  expect(writePool.execute).toHaveBeenCalledTimes(7);
+  expect(readPool.execute).not.toHaveBeenCalled();
+  await db.end();
+});
+
+test('keeps non-string and unsupported query arguments on the write pool', async () => {
+  const writePool = { query: jest.fn(), execute: jest.fn(), end: jest.fn(async () => undefined) };
+  const readPool = { query: jest.fn(), execute: jest.fn(), end: jest.fn(async () => undefined) };
+  const mysqlLib = { createPool: jest.fn().mockReturnValueOnce(writePool).mockReturnValueOnce(readPool) };
+  const db = await createDb({ env: { ...env, MYSQL_READPORT: '3307' }, mysqlLib, log: logger() });
+  await db.query({ sql: 'SELECT 1' });
+  await db.query({});
+  await db.query('-- comment without newline');
+  await db.query('WITH rows AS (SELECT 1) SELECT * FROM rows');
+  expect(writePool.query).toHaveBeenCalledTimes(3);
+  expect(readPool.query).toHaveBeenCalledTimes(1);
+  await db.end();
+});
