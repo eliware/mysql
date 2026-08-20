@@ -31,3 +31,7 @@ Tests should maintain 100% coverage without Istanbul ignore directives. Add or u
 - Update `README.md` and `example.mjs` for user-facing behavior.
 - Do not bump versions, create release notes, tag, or publish unless explicitly requested.
 - Do not make destructive database changes in tests or examples; use read-only health queries such as `SELECT 1`.
+- Do not over-engineer simple tasks.
+- Do not guess when confused.
+- Do not make random, pointless changes.
+- Check your own work before saying you're done.
