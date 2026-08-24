@@ -6,6 +6,6 @@ export interface CreateDbOptions {
   log?: { debug: (...args: unknown[]) => void; error: (...args: unknown[]) => void };
   poolOptions?: Partial<PoolOptions>;
 }
-export function createDb(options?: CreateDbOptions): Pool;
+export function createDb(options?: CreateDbOptions): Promise<Pool>;
 export function verifyConnection(pool: Pick<Pool, 'query'>): Promise<boolean>;
 export function closeDb(pool: Pick<Pool, 'end'>): Promise<void>;
