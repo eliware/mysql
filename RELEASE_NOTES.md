@@ -1,6 +1,6 @@
 # Release Notes
 
-## 2.0.0 — Unreleased
+## 2.0.0 — 2026-08-26
 
 - **Breaking:** Corrected the TypeScript declaration for `createDb()` to return
   `Promise<Pool>`, matching the runtime API.
@@ -10,7 +10,6 @@
   package-level release notes, and a runnable example.
 - Added cleanup when optional read-pool creation fails and redacted TLS private
   keys and passphrases from debug configuration logs.
-- No package version bump or publication has been performed.
 
 ## 1.1.6 — 2026-08-13
 
