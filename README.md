@@ -133,6 +133,8 @@ export interface CreateDbOptions {
   mysqlLib?: { createPool: (options: import('mysql2/promise').PoolOptions) => import('mysql2/promise').Pool };
   /** Logger implementing debug and error */
   log?: { debug: (...args: unknown[]) => void; error: (...args: unknown[]) => void };
+  /** Explicit mysql2 pool options */
+  poolOptions?: Partial<import('mysql2/promise').PoolOptions>;
 }
 
 export function createDb(options?: CreateDbOptions): Promise<import('mysql2/promise').Pool>;
@@ -152,7 +154,6 @@ write pool so transaction state remains pinned safely.
 
 ```bash
 npm test
-npm run test:gaps
 npm run lint
 npm run typecheck
 npm run pack

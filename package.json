@@ -9,8 +9,10 @@
         "index.d.ts",
         "README.md",
         "LICENSE",
+        "RELEASE_NOTES.md",
         "examples"
     ],
+    "publishConfig": { "access": "public" },
     "exports": {
         ".": {
             "types": "./index.d.ts",
@@ -18,9 +20,8 @@
         }
     },
     "scripts": {
-        "test": "npx --node-options=\"--experimental-vm-modules --no-warnings\" jest --detectOpenHandles --silent --coverage",
-        "test:gaps": "npm test 2>&1 | grep '|' | grep -vF '|     100 |      100 |     100 |     100 |'",
-        "lint": "npx oxlint .",
+        "test": "eliware-test",
+        "lint": "eliware-test --lint",
         "pack": "npm pack --dry-run",
         "typecheck": "tsc --project tsconfig.json"
     },
@@ -43,19 +44,12 @@
     },
     "homepage": "https://github.com/eliware/mysql#readme",
     "devDependencies": {
-        "jest": "^30.4.2",
+        "@eliware/test": "^2.0.0",
         "typescript": "^7.0.2"
     },
-    "jest": {
-        "testEnvironment": "node",
-        "testMatch": [
-            "**/?(*.)+(spec|test).[jt]s?(x)",
-            "**/?(*.)+(spec|test).mjs"
-        ]
-    },
     "dependencies": {
-        "@eliware/log": "^1.1.12",
-        "mysql2": "^3.23.3"
+        "@eliware/log": "^2.0.0",
+        "mysql2": "^3.24.2"
     },
     "engines": {
         "node": ">=26"

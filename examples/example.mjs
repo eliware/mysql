@@ -1,5 +1,5 @@
 import log from '@eliware/log';
-import { closeDb, createDb, verifyConnection } from './index.mjs';
+import { closeDb, createDb, verifyConnection } from '../index.mjs';
 
 const db = await createDb({
   log,

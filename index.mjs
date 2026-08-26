@@ -59,6 +59,15 @@ const poolConfig = (env, poolOptions) => {
   return config;
 };
 
+const redactedConfig = (config) => {
+  const safe = { ...config, password: undefined };
+  if (safe.ssl && typeof safe.ssl === 'object') {
+    safe.ssl = { ...safe.ssl };
+    for (const key of ['key', 'privateKey', 'passphrase']) safe.ssl[key] = undefined;
+  }
+  return safe;
+};
+
 /** Create a MySQL connection pool. */
 export async function createDb({ env = process.env, mysqlLib, log = logger, poolOptions = {} } = {}) {
   const missing = REQUIRED_ENV.filter((name) => !env[name]);
@@ -66,7 +75,7 @@ export async function createDb({ env = process.env, mysqlLib, log = logger, pool
   const config = poolConfig(env, poolOptions);
   const mysqlModule = mysqlLib ?? mysql2Promise;
   try {
-    log.debug('Creating MySQL pool with config', { ...config, password: undefined });
+    log.debug('Creating MySQL pool with config', redactedConfig(config));
     if (typeof mysqlModule.createPool !== 'function') throw new Error('Provided mysqlLib does not have a createPool method.');
     const writePool = mysqlModule.createPool(config);
     if (!env.MYSQL_READPORT) {
@@ -74,7 +83,13 @@ export async function createDb({ env = process.env, mysqlLib, log = logger, pool
       return writePool;
     }
     const readConfig = { ...config, host: env.MYSQL_READHOST || env.MYSQL_HOST, port: parseInteger(env.MYSQL_READPORT, 3307, 1) };
-    const readPool = mysqlModule.createPool(readConfig);
+    let readPool;
+    try {
+      readPool = mysqlModule.createPool(readConfig);
+    } catch (error) {
+      await writePool.end();
+      throw error;
+    }
     const db = createRoutingPool(writePool, readPool);
     log.debug('MySQL pool created');
     return db;
