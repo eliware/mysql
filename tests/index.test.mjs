@@ -58,6 +58,23 @@ describe('createDb', () => {
     await expect(createDb({ env, mysqlLib, log })).rejects.toBe('fail');
     expect(log.error).toHaveBeenCalledWith('Failed to create MySQL connection pool', 'fail');
   });
+
+  test('redacts TLS private material from debug logs', async () => {
+    const mysqlLib = { createPool: jest.fn(() => ({})) };
+    const log = logger();
+    await createDb({ env, mysqlLib, log, poolOptions: { ssl: { ca: 'ca', key: 'secret-key', privateKey: 'secret-private-key', passphrase: 'secret-passphrase' } } });
+    const config = log.debug.mock.calls[0][1];
+    expect(config.password).toBeUndefined();
+    expect(config.ssl).toEqual({ ca: 'ca', key: undefined, privateKey: undefined, passphrase: undefined });
+  });
+
+  test('closes the write pool when the read pool cannot be created', async () => {
+    const writePool = { end: jest.fn(async () => undefined) };
+    const error = new Error('read pool failed');
+    const mysqlLib = { createPool: jest.fn().mockReturnValueOnce(writePool).mockImplementationOnce(() => { throw error; }) };
+    await expect(createDb({ env: { ...env, MYSQL_READPORT: '3307' }, mysqlLib, log: logger() })).rejects.toBe(error);
+    expect(writePool.end).toHaveBeenCalledTimes(1);
+  });
 });
 
 test('supports pool overrides, TLS, timeouts, health checks, and close', async () => {
