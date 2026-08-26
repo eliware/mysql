@@ -65,7 +65,7 @@ Creates and returns a MySQL connection pool.
 **Parameters:**
 
 - `options.env` (object, optional): Environment variables (default: `process.env`)
-- `options.mysqlLib` (object, optional): mysql2/promise module (default: static import/require, must have createPool)
+- `options.mysqlLib` (object, optional): mysql2/promise module (default: static ESM import, must have createPool)
 - `options.log` (object, optional): Logger instance (default: `@eliware/log`)
 - `options.poolOptions` (object, optional): Explicit mysql2 pool options; these override environment-derived values.
 
@@ -156,6 +156,7 @@ write pool so transaction state remains pinned safely.
 npm test
 npm run lint
 npm run typecheck
+npm audit --omit=dev --audit-level=moderate
 npm run pack
 ```
 
