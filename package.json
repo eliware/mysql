@@ -12,7 +12,9 @@
         "RELEASE_NOTES.md",
         "examples"
     ],
-    "publishConfig": { "access": "public" },
+    "publishConfig": {
+        "access": "public"
+    },
     "exports": {
         ".": {
             "types": "./index.d.ts",
