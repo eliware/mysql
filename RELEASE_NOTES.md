@@ -1,6 +1,6 @@
 # Release Notes
 
-## 2.0.0 — 2026-08-26
+## 2.0.0 — 2026-08-25
 
 - **Breaking:** Corrected the TypeScript declaration for `createDb()` to return
   `Promise<Pool>`, matching the runtime API.
@@ -8,6 +8,7 @@
   `@eliware/test` harness and current cross-platform CI conventions.
 - Added production dependency auditing, explicit public publish metadata,
   package-level release notes, and a runnable example.
+- Updated runtime dependencies to `@eliware/log` 2.0.0 and `mysql2` 3.24.2.
 - Added cleanup when optional read-pool creation fails and redacted TLS private
   keys and passphrases from debug configuration logs.
 

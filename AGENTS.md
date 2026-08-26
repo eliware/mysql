@@ -30,7 +30,7 @@ Tests should maintain 100% coverage without Istanbul ignore directives. Add or u
 ## Changes
 
 - Update `index.d.ts` whenever the public API changes.
-- Update `README.md` and `example.mjs` for user-facing behavior.
+- Update `README.md` and `examples/example.mjs` for user-facing behavior.
 - Do not bump versions, create release notes, tag, or publish unless explicitly requested.
 - Do not make destructive database changes in tests or examples; use read-only health queries such as `SELECT 1`.
 - Do not over-engineer simple tasks.

@@ -105,6 +105,9 @@ Optional:
 **Example:**
 
 ```js
+import mysql2Promise from 'mysql2/promise';
+import { createDb } from '@eliware/mysql';
+
 const db = await createDb({
   env: {
     MYSQL_HOST: 'localhost',
@@ -142,7 +145,7 @@ export function createDb(options?: CreateDbOptions): Promise<import('mysql2/prom
 
 ## Errors / Troubleshooting
 
-`createDb()` validates required environment variables before creating a pool and rethrows pool-creation errors after logging redacted details. Passwords and private TLS key material must not be logged. Use `verifyConnection(pool)` for a read-only `SELECT 1` health check and `closeDb(pool)` for repeatable application shutdown cleanup.
+`createDb()` validates required environment variables before creating a pool and rethrows pool-creation errors after logging redacted details. Passwords and private TLS key material must not be logged. The package intentionally depends directly on `@eliware/log` as an approved foundational logging exception. Use `verifyConnection(pool)` for a read-only `SELECT 1` health check and `closeDb(pool)` for repeatable application shutdown cleanup.
 
 When `MYSQL_READPORT` is set, `query()` and `execute()` route only single-statement
 `SELECT`, `SHOW`, `DESCRIBE`, `DESC`, and `EXPLAIN` calls to the read pool. Queries
@@ -161,6 +164,11 @@ npm run pack
 ```
 
 Tests inject the MySQL module, environment, logger, and pool options; no live database or destructive query is required.
+
+This package is a library, not a deployable service. Applications embedding it
+own deployment, backup, rollback, recovery, readiness/liveness, and production
+database operations. The included `.knit/deploy.yaml` defines repository
+validation only; it does not modify databases.
 
 ## Security
 

@@ -7,7 +7,7 @@ const db = await createDb({
   poolOptions: {
     connectionLimit: 10,
     // Enable opt-in TLS when the CA is available:
-    // ssl: { ca: '/etc/mysql/tls/ca.pem', rejectUnauthorized: true },
+    // ssl: { ca: process.env.MYSQL_CA, rejectUnauthorized: true },
   },
 });
 
