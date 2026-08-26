@@ -1,5 +1,13 @@
 # Release Notes
 
+## 2.0.0 — Unreleased
+
+- Modernized validation around the shared `@eliware/test` harness and current
+  cross-platform CI conventions.
+- Added production dependency auditing, explicit public publish metadata, and
+  a runnable package example.
+- No package version bump or publication has been performed.
+
 ## 1.1.6 — 2026-08-13
 
 - Added optional read-pool routing with `MYSQL_READPORT` and `MYSQL_READHOST`.
