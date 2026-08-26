@@ -52,11 +52,14 @@
             "**/?(*.)+(spec|test).[jt]s?(x)",
             "**/?(*.)+(spec|test).mjs"
         ],
-        "coverageReporters": ["text", "json-summary"]
+        "coverageReporters": [
+            "text",
+            "json-summary"
+        ]
     },
     "dependencies": {
-        "@eliware/log": "^1.1.12",
-        "mysql2": "^3.23.3"
+        "@eliware/log": "^2.0.0",
+        "mysql2": "^3.24.2"
     },
     "engines": {
         "node": ">=26"
