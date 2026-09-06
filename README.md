@@ -2,6 +2,8 @@
 
 ## @eliware/mysql [![npm version](https://img.shields.io/npm/v/@eliware/mysql.svg)](https://www.npmjs.com/package/@eliware/mysql)[![license](https://img.shields.io/github/license/eliware/mysql.svg)](LICENSE)[![build status](https://github.com/eliware/mysql/actions/workflows/nodejs.yml/badge.svg)](https://github.com/eliware/mysql/actions)
 
+Documentation: [docs](docs/README.md) · [specifications](specs/README.md) · [examples](examples/README.md)
+
 > A simple, dependency-injectable MySQL connection pool utility for Node.js, supporting ESM.
 
 ---
